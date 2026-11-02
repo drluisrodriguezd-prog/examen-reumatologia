@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Examen de Reumatología — Módulo 1</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+  :root {
+    --paper: #eff1ee;
+    --surface: #ffffff;
+    --ink: #17262c;
+    --muted: #5b6b66;
+    --line: #c7cfc9;
+    --line-soft: #dde3de;
+    --teal: #2b6e68;
+    --teal-soft: #e2ede9;
+    --teal-deep: #17262c;
+    --good: #2e7d32;
+    --good-soft: #e5f2e6;
+    --bad: #b3261e;
+    --bad-soft: #fbe9e7;
+    --amber: #9c6d1e;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #11191b;
+      --surface: #16211f;
+      --ink: #e7eae5;
+      --muted: #9fb0aa;
+      --line: #35433f;
+      --line-soft: #263130;
+      --teal: #5fb8ae;
+      --teal-soft: #1d322f;
+      --teal-deep: #0c1314;
+      --good: #6fcf73;
+      --good-soft: #1c2e1d;
+      --bad: #ef6b63;
+      --bad-soft: #35201e;
+      --amber: #d9a855;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  .shell { max-width: 760px; margin: 0 auto; padding: 0 1.25rem 4rem; }
+
+  .top-header {
+    background: var(--teal-deep);
+    color: #eff1ee;
+    padding: 1.6rem 1.25rem 1.3rem;
+    text-align: center;
+    border-bottom: 3px solid var(--teal);
+    margin-bottom: 2rem;
+  }
+  .top-header .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #8fc9c2;
+    font-weight: 600;
+  }
+  .top-header h1 {
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-weight: 700;
+    font-size: clamp(1.4rem, 4vw, 1.9rem);
+    margin: 0.35rem 0 0.25rem;
+    text-wrap: balance;
+  }
+  .top-header .sub { font-size: 0.88rem; opacity: 0.82; margin: 0; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 1.6rem 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  h2.section-title {
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-weight: 600;
+    font-size: 1.2rem;
+    color: var(--teal);
+    margin: 0 0 1.1rem;
+  }
+
+  label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--muted); margin-bottom: 0.35rem; letter-spacing: 0.01em; }
+  input[type="text"], select {
+    width: 100%;
+    font-size: 0.98rem;
+    font-family: inherit;
+    padding: 0.65rem 0.8rem;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--paper);
+    color: var(--ink);
+    margin-bottom: 1.1rem;
+  }
+  input[type="text"]:focus, select:focus { outline: 2px solid var(--teal); outline-offset: 1px; }
+
+  .btn {
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 0.7rem 1.4rem;
+    border-radius: 7px;
+    border: 1px solid var(--teal);
+    background: var(--teal);
+    color: #ffffff;
+    cursor: pointer;
+    transition: filter 0.15s;
+  }
+  .btn:hover { filter: brightness(1.08); }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn.secondary { background: transparent; color: var(--teal); }
+  .btn.ghost { background: transparent; color: var(--muted); border-color: var(--line); }
+
+  .row { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+
+  /* ---- Pantalla de examen ---- */
+  .exam-topbar {
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.82rem; color: var(--muted);
+    margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;
+  }
+  .timer { font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .timer.warn { color: var(--bad); }
+
+  .progress-track { height: 6px; background: var(--line-soft); border-radius: 4px; overflow: hidden; margin-bottom: 1.4rem; }
+  .progress-fill { height: 100%; background: var(--teal); transition: width 0.25s; }
+
+  .vineta {
+    font-size: 0.97rem;
+    margin-bottom: 0.9rem;
+    padding: 0.85rem 1rem;
+    background: var(--teal-soft);
+    border-left: 3px solid var(--teal);
+    border-radius: 0 6px 6px 0;
+  }
+  .pregunta-texto { font-size: 1.02rem; font-weight: 600; margin-bottom: 1.1rem; }
+
+  .opciones { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.5rem; }
+  .opcion {
+    display: flex; gap: 0.7rem; align-items: flex-start;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 0.93rem;
+  }
+  .opcion:hover { border-color: var(--teal); }
+  .opcion.selected { border-color: var(--teal); background: var(--teal-soft); }
+  .opcion .letra {
+    font-family: 'IBM Plex Mono', monospace; font-weight: 700; color: var(--teal);
+    flex-shrink: 0; width: 1.3rem;
+  }
+
+  .nav-row { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+
+  .unanswered-note { font-size: 0.82rem; color: var(--amber); margin-top: 0.4rem; }
+
+  /* ---- Overlay de confirmación ---- */
+  .overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+    display: flex; align-items: center; justify-content: center; padding: 1.25rem; z-index: 50;
+  }
+  .overlay-card {
+    background: var(--surface); border-radius: 10px; padding: 1.6rem; max-width: 420px;
+    border: 1px solid var(--line);
+  }
+  .overlay-card p { font-size: 0.93rem; margin: 0 0 1.2rem; }
+
+  /* ---- Resultados ---- */
+  .score-big { text-align: center; padding: 1.2rem 0 0.4rem; }
+  .score-big .num { font-family: 'IBM Plex Mono', monospace; font-size: 3rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .score-big .num.pass { color: var(--good); }
+  .score-big .num.fail { color: var(--bad); }
+  .score-big .estado { font-weight: 700; letter-spacing: 0.04em; font-size: 0.95rem; margin-top: 0.2rem; }
+  .score-big .estado.pass { color: var(--good); }
+  .score-big .estado.fail { color: var(--bad); }
+
+  table.breakdown { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin-top: 0.6rem; }
+  table.breakdown th { text-align: left; font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); padding: 0.5rem 0.5rem; border-bottom: 1px solid var(--line); }
+  table.breakdown td { padding: 0.55rem 0.5rem; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+  table.breakdown td.num { font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums; text-align: center; white-space: nowrap; }
+  table.breakdown td.just { font-size: 0.85rem; color: var(--muted); }
+  table.breakdown.clave { table-layout: fixed; }
+  table.breakdown.clave th:nth-child(1), table.breakdown.clave td:nth-child(1) { width: 2.2rem; text-align: center; }
+  table.breakdown.clave th:nth-child(2), table.breakdown.clave td:nth-child(2) { width: 30%; }
+  table.breakdown.clave th:nth-child(3), table.breakdown.clave td:nth-child(3) { width: auto; }
+
+  .review-item { border: 1px solid var(--line); border-radius: 8px; padding: 1.1rem 1.2rem; margin-bottom: 0.9rem; }
+  .review-item.correct { border-left: 3px solid var(--good); }
+  .review-item.incorrect { border-left: 3px solid var(--bad); }
+  .review-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem; gap: 0.5rem; flex-wrap: wrap; }
+  .review-head .qn { font-weight: 700; font-size: 0.92rem; }
+  .review-head .tag { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .review-head .mark { font-weight: 700; font-size: 0.82rem; }
+  .review-item.correct .mark { color: var(--good); }
+  .review-item.incorrect .mark { color: var(--bad); }
+  .review-opt { font-size: 0.88rem; margin: 0.15rem 0; color: var(--muted); }
+  .review-opt.is-correct { color: var(--good); font-weight: 600; }
+  .review-opt.is-chosen-wrong { color: var(--bad); font-weight: 600; text-decoration: line-through; }
+  .review-just { font-size: 0.85rem; margin-top: 0.6rem; padding: 0.6rem 0.75rem; background: var(--paper); border-radius: 6px; color: var(--muted); }
+
+  .actions-row { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1.4rem; }
+
+  [hidden] { display: none !important; }
+
+  /* ===================== IMPRESIÓN ===================== */
+  #print-view { display: none; }
+
+  @media print {
+    body * { visibility: hidden; }
+    #print-view, #print-view * { visibility: visible; }
+    #print-view { display: block !important; position: absolute; top: 0; left: 0; width: 100%; }
+    .shell, .top-header { display: none !important; }
+
+    .pv-page { padding: 0.4in 0.5in; }
+    .pv-header { text-align: center; border-bottom: 2px solid #17262c; padding-bottom: 0.3in; margin-bottom: 0.3in; }
+    .pv-header .inst { font-size: 10pt; letter-spacing: 0.08em; text-transform: uppercase; color: #5b6b66; }
+    .pv-header h1 { font-size: 16pt; margin: 0.1in 0 0.05in; font-family: Georgia, serif; }
+    .pv-header .mod { font-size: 10pt; color: #5b6b66; }
+
+    .pv-meta { display: flex; justify-content: space-between; font-size: 10pt; margin-bottom: 0.25in; }
+    .pv-score { text-align: center; margin-bottom: 0.25in; }
+    .pv-score .n { font-size: 28pt; font-weight: 700; }
+    .pv-score .n.pass { color: #2e7d32; }
+    .pv-score .n.fail { color: #b3261e; }
+    .pv-score .e { font-weight: 700; font-size: 11pt; }
+
+    table.pv-table { width: 100%; border-collapse: collapse; font-size: 9pt; margin-bottom: 0.3in; }
+    table.pv-table th, table.pv-table td { border: 0.5pt solid #999; padding: 4pt 6pt; text-align: left; vertical-align: top; }
+    table.pv-table th { background: #e2ede9; }
+    table.pv-table td.c { text-align: center; white-space: nowrap; }
+    .pv-section-title { font-size: 12pt; font-weight: 700; margin: 0.3in 0 0.1in; page-break-after: avoid; }
+    .pv-break { page-break-before: always; }
+
+    .pv-q { page-break-inside: avoid; border: 0.5pt solid #ccc; border-radius: 4pt; padding: 8pt 10pt; margin-bottom: 8pt; font-size: 9.5pt; }
+    .pv-q .qh { font-weight: 700; margin-bottom: 3pt; }
+    .pv-q .qv { font-style: italic; color: #333; margin-bottom: 3pt; }
+    .pv-q .qo { margin: 1pt 0; }
+    .pv-q .qo.ok { color: #2e7d32; font-weight: 700; }
+    .pv-q .qo.bad { color: #b3261e; text-decoration: line-through; }
+    .pv-q .qj { margin-top: 4pt; font-size: 8.5pt; color: #444; }
+
+    .pv-signatures { page-break-inside: avoid; margin-top: 0.4in; display: flex; justify-content: space-between; gap: 0.4in; }
+    .pv-sig { flex: 1; text-align: center; font-size: 9.5pt; }
+    .pv-sig .line { border-top: 1pt solid #17262c; margin-top: 0.5in; padding-top: 4pt; }
+    .pv-sig .seal { margin-top: 0.25in; border: 1pt dashed #999; height: 0.6in; border-radius: 4pt; font-size: 8pt; color: #999; display: flex; align-items: center; justify-content: center; }
+
+    @page { margin: 0.5in; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-header">
+  <div class="eyebrow">Jefatura de Enseñanza y Residentes</div>
+  <h1>Examen de Reumatología — Módulo 1</h1>
+  <p class="sub">Hospital Belga, Cochabamba, Bolivia · Sesiones 1–23 (excluye Imagenología) · Nivel R1–R2</p>
+</div>
+
+<div class="shell">
+
+  <!-- ============ PANTALLA 1: REGISTRO ============ -->
+  <section id="screen-registro">
+    <div class="card">
+      <h2 class="section-title">Datos del residente</h2>
+      <label for="inp-nombre">Nombre completo</label>
+      <input type="text" id="inp-nombre" placeholder="Ej. Juan Pérez Mamani" autocomplete="off">
+
+      <label for="inp-nivel">Nivel de residencia</label>
+      <select id="inp-nivel">
+        <option value="R1">R1</option>
+        <option value="R2">R2</option>
+        <option value="R3">R3</option>
+      </select>
+
+      <p style="font-size:0.85rem; color:var(--muted); margin:0 0 1.2rem;">
+        20 preguntas de selección múltiple · 20 minutos · única respuesta correcta por pregunta. No se revela si una respuesta es correcta hasta finalizar el examen completo.
+      </p>
+
+      <div class="row">
+        <span></span>
+        <button class="btn" id="btn-empezar">Iniciar examen</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PANTALLA 2: EXAMEN ============ -->
+  <section id="screen-examen" hidden>
+    <div class="exam-topbar">
+      <span id="contador-preg">Pregunta 1 de 20</span>
+      <span class="timer" id="timer-display">20:00</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:5%"></div></div>
+
+    <div class="card">
+      <div class="vineta" id="q-vineta"></div>
+      <div class="pregunta-texto" id="q-texto"></div>
+      <div class="opciones" id="q-opciones"></div>
+
+      <div class="nav-row">
+        <button class="btn ghost" id="btn-anterior">← Anterior</button>
+        <button class="btn secondary" id="btn-finalizar">Finalizar examen</button>
+        <button class="btn" id="btn-siguiente">Siguiente →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PANTALLA 3: RESULTADOS ============ -->
+  <section id="screen-resultados" hidden>
+    <div class="card">
+      <h2 class="section-title">Resultado</h2>
+      <div class="score-big">
+        <div class="num" id="res-porcentaje">—</div>
+        <div class="estado" id="res-estado">—</div>
+      </div>
+      <table class="breakdown" id="res-breakdown"></table>
+    </div>
+
+    <div class="card">
+      <h2 class="section-title">Revisión pregunta por pregunta</h2>
+      <div id="res-review"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="section-title">Clave de respuestas</h2>
+      <table class="breakdown clave" id="res-clave"></table>
+    </div>
+
+    <div class="actions-row">
+      <button class="btn" id="btn-generar-pdf">Generar PDF para imprimir y firmar</button>
+    </div>
+    <p style="font-size:0.8rem; color:var(--muted); margin-top:0.6rem;">
+      Al presionar el botón se abrirá el diálogo de impresión del navegador. Selecciona "Guardar como PDF" o imprime directamente para firma y sello.
+    </p>
+  </section>
+
+</div>
+
+<!-- Overlay de confirmación para finalizar con preguntas sin responder -->
+<div class="overlay" id="overlay-confirm" hidden>
+  <div class="overlay-card">
+    <p id="overlay-text">¿Seguro que deseas finalizar el examen?</p>
+    <div class="row">
+      <button class="btn ghost" id="overlay-cancel">Volver al examen</button>
+      <button class="btn" id="overlay-ok">Sí, finalizar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ VISTA DE IMPRESIÓN (oculta en pantalla) ============ -->
+<div id="print-view"></div>
+
+<script>
+(function () {
+
+  var QUESTIONS = [
+    { cat: "Inmunología básica",
+      vineta: "Un paciente presenta una infección bacteriana aguda. Horas antes de que se generen anticuerpos específicos, macrófagos y neutrófilos ya reconocen y responden al patógeno mediante receptores germline-encoded (p. ej., receptores tipo Toll).",
+      texto: "¿A qué componente del sistema inmune corresponde este mecanismo de reconocimiento inmediato y no específico?",
+      opciones: ["Inmunidad adaptativa humoral", "Inmunidad innata", "Memoria inmunológica mediada por linfocitos B", "Respuesta mediada por linfocitos T citotóxicos de memoria", "Tolerancia periférica"],
+      correcta: 1,
+      justificacion: "La inmunidad innata actúa en minutos-horas mediante receptores de reconocimiento de patrones (PRR, incluidos TLR) que detectan patrones moleculares conservados en patógenos (PAMP), sin requerir exposición previa ni generar memoria específica, a diferencia de la inmunidad adaptativa (linfocitos T y B), que tarda días y sí genera memoria." },
+
+    { cat: "Inmunología básica",
+      vineta: "Una paciente de 28 años desarrolla una enfermedad autoinmune. Se plantea que linfocitos T autorreactivos, que normalmente deberían eliminarse en el timo (selección negativa), escaparon a la periferia y fueron activados tras una infección viral con epítopos estructuralmente similares a antígenos propios.",
+      texto: "¿Qué mecanismo de ruptura de la tolerancia inmunológica describe mejor este escenario?",
+      opciones: ["Deleción clonal central exitosa", "Mimetismo molecular", "Anergia periférica", "Supresión por linfocitos T reguladores", "Exclusión antigénica"],
+      correcta: 1,
+      justificacion: "El mimetismo molecular ocurre cuando epítopos microbianos comparten homología estructural con autoantígenos; la respuesta inmune generada contra el patógeno reacciona cruzadamente contra tejido propio. La falla de la selección negativa tímica (tolerancia central) permite que clones autorreactivos lleguen a la periferia, donde este mecanismo los activa." },
+
+    { cat: "Semiología y diagnóstico",
+      vineta: "Varón de 45 años consulta por monoartritis aguda de rodilla, de 24 horas de evolución, con dolor intenso, calor local y derrame articular. Se realiza artrocentesis diagnóstica.",
+      texto: "¿Qué hallazgo en el líquido sinovial es más útil para distinguir una artritis séptica de una artritis inflamatoria no infecciosa en este contexto?",
+      opciones: ["Color amarillo claro", "Viscosidad conservada", "Recuento leucocitario > 50 000/mm³ con predominio de polimorfonucleares y tinción de Gram o cultivo positivos", "Ausencia de cristales", "pH ligeramente alcalino"],
+      correcta: 2,
+      justificacion: "Ante monoartritis aguda, la artrocentesis es obligatoria y urgente para descartar artritis séptica. Un recuento > 50 000/mm³ con predominio de PMN, junto con Gram o cultivo positivo, confirma infección; valores intermedios sugieren inflamación no séptica (incluyendo artropatías por cristales), y valores bajos sugieren líquido no inflamatorio (p. ej., osteoartritis)." },
+
+    { cat: "Semiología y diagnóstico",
+      vineta: "Se solicita un panel de autoanticuerpos en una paciente con artralgias inespecíficas sin otros datos clínicos sugerentes de enfermedad autoinmune. El ANA resulta positivo a título 1:80.",
+      texto: "¿Cuál es la interpretación correcta de este resultado aislado?",
+      opciones: ["Confirma lupus eritematoso sistémico", "Descarta cualquier enfermedad autoinmune", "Tiene baja especificidad diagnóstica aislado: hasta un porcentaje relevante de la población sana presenta ANA positivo a títulos bajos, por lo que debe interpretarse en el contexto clínico", "Indica indefectiblemente esclerosis sistémica", "Sustituye la necesidad de anticuerpos específicos (anti-dsDNA, ENA)"],
+      correcta: 2,
+      justificacion: "El ANA es una prueba de tamizaje sensible pero poco específica; títulos bajos son frecuentes en población sana y en otras condiciones. Un ANA positivo sin clínica sugerente no debe generar un diagnóstico ni una cascada de estudios innecesarios: los criterios ACR/EULAR 2019 para LES usan el ANA ≥1:80 solo como criterio de entrada, no diagnóstico por sí mismo." },
+
+    { cat: "Artritis reumatoide",
+      vineta: "Mujer de 50 años con poliartritis simétrica de pequeñas articulaciones de manos (MCF e IFP) de 8 semanas de evolución, rigidez matutina de 45 minutos, FR y anti-CCP positivos a títulos altos.",
+      texto: "Según los criterios de clasificación ACR/EULAR 2010, ¿qué combinación de hallazgos apoya con mayor peso el diagnóstico de artritis reumatoide?",
+      opciones: ["Afección de grandes articulaciones únicamente", "Duración menor a 6 semanas con serología negativa", "Compromiso poliarticular de pequeñas articulaciones con anti-CCP a título alto y duración ≥ 6 semanas", "VSG y PCR normales", "Afección exclusiva de articulaciones interfalángicas distales"],
+      correcta: 2,
+      justificacion: "Los criterios ACR/EULAR 2010 ponderan número y tamaño de articulaciones afectadas (mayor puntaje a pequeñas articulaciones), serología (mayor puntaje a títulos altos de FR/anti-CCP), duración ≥6 semanas y reactantes de fase aguda elevados. El compromiso simétrico de pequeñas articulaciones con anti-CCP alto es el patrón de mayor especificidad." },
+
+    { cat: "Artritis reumatoide",
+      vineta: "Paciente con artritis reumatoide de diagnóstico reciente inicia tratamiento. El plan terapéutico contempla ajustar la dosis o combinar fármacos según la actividad de la enfermedad medida en cada visita (p. ej., DAS28), hasta alcanzar remisión o baja actividad.",
+      texto: "¿Cómo se denomina esta estrategia terapéutica y cuál es el FAME convencional de primera línea recomendado?",
+      opciones: ["Step-down therapy; leflunomida", "Treat-to-target; metotrexato", "Terapia de rescate; hidroxicloroquina", "Terapia secuencial fija; sulfasalazina", "Desescalamiento programado; metotrexato"],
+      correcta: 1,
+      justificacion: "El tratamiento de la artritis reumatoide sigue la estrategia treat-to-target: ajuste terapéutico guiado por medición objetiva y repetida de la actividad de enfermedad hasta alcanzar remisión o baja actividad. El metotrexato es el FAME convencional de primera línea salvo contraindicación." },
+
+    { cat: "Artritis reumatoide",
+      vineta: "Paciente con artritis reumatoide refractaria a metotrexato en dosis óptima se considera para inicio de un inhibidor de JAK.",
+      texto: "¿Qué evaluación es obligatoria antes de iniciar esta terapia, dado el perfil de seguridad descrito en estudios como ORAL Surveillance?",
+      opciones: ["Solo función renal basal", "Tamizaje de tuberculosis latente y evaluación de riesgo cardiovascular y tromboembólico, además de hepatitis B/C", "Únicamente perfil lipídico", "No se requiere evaluación previa, a diferencia de los biológicos", "Solo hemograma basal"],
+      correcta: 1,
+      justificacion: "Los inhibidores de JAK comparten con los biológicos el riesgo de infecciones (incluida reactivación de TB y hepatitis) y, según el estudio ORAL Surveillance, mostraron mayor riesgo de eventos cardiovasculares mayores, tromboembolismo venoso y neoplasias frente a anti-TNF, en especial en pacientes de alto riesgo, lo que motivó evaluar este riesgo antes de indicarlos." },
+
+    { cat: "Espondiloartritis",
+      vineta: "Varón de 24 años con lumbalgia inflamatoria de 4 meses de evolución (mejora con ejercicio, rigidez matutina > 30 min, dolor nocturno), HLA-B27 positivo. La RM de articulaciones sacroilíacas muestra edema óseo subcondral compatible con sacroileítis activa.",
+      texto: "¿Qué conjunto de criterios de clasificación aplica a este cuadro de espondiloartritis predominantemente axial?",
+      opciones: ["Criterios de Nueva York modificados exclusivamente", "Criterios ASAS para espondiloartritis axial (brazo de imagen o brazo clínico)", "Criterios ACR/EULAR 2010", "Criterios de Sapporo", "Criterios CASPAR"],
+      correcta: 1,
+      justificacion: "Los criterios ASAS permiten clasificar espondiloartritis axial mediante dos brazos: imagenológico (sacroileítis objetivada + ≥1 característica de EspA) o clínico (HLA-B27 positivo + ≥2 características), siendo más sensibles que los criterios de Nueva York para enfermedad temprana no radiográfica." },
+
+    { cat: "Espondiloartritis",
+      vineta: "Paciente con psoriasis cutánea conocida desarrolla dactilitis del tercer dedo de la mano ('dedo en salchicha'), entesitis aquílea y artritis asimétrica de articulaciones interfalángicas distales.",
+      texto: "¿Qué hallazgo de este caso es más característico y distintivo de artritis psoriásica frente a artritis reumatoide?",
+      opciones: ["Simetría articular", "Positividad de factor reumatoide", "Dactilitis y compromiso de articulaciones interfalángicas distales", "Nódulos subcutáneos", "Rigidez matutina prolongada"],
+      correcta: 2,
+      justificacion: "La dactilitis (tenosinovitis + artritis + edema de tejidos blandos de todo el dedo) y el compromiso de interfalángicas distales son hallazgos característicos de artritis psoriásica, infrecuentes en artritis reumatoide. Los criterios CASPAR incorporan precisamente estos elementos junto con psoriasis personal o familiar." },
+
+    { cat: "Lupus y SAF",
+      vineta: "Mujer de 32 años presenta eritema malar fotosensible, artralgias, úlceras orales indoloras, ANA positivo 1:320, anti-dsDNA positivo y C3/C4 bajos.",
+      texto: "¿Qué papel cumple el ANA positivo dentro de los criterios de clasificación ACR/EULAR 2019 para lupus eritematoso sistémico?",
+      opciones: ["Es un criterio ponderado como cualquier otro, sin jerarquía", "Es el criterio de entrada obligatorio (ANA ≥1:80); sin él no se puede aplicar el resto de los criterios", "No forma parte de los criterios", "Reemplaza la necesidad de evaluar clínica o complemento", "Solo aplica en población pediátrica"],
+      correcta: 1,
+      justificacion: "Los criterios ACR/EULAR 2019 exigen un ANA positivo ≥1:80 como criterio de entrada obligatorio; sin él no se puede clasificar como LES por estos criterios. Cumplido ese requisito, se suman criterios clínicos e inmunológicos ponderados hasta alcanzar el umbral de clasificación (≥10 puntos)." },
+
+    { cat: "Lupus y SAF",
+      vineta: "Paciente con LES desarrolla proteinuria en rango nefrótico y hematuria microscópica. La biopsia renal muestra proliferación endocapilar difusa que afecta más del 50% de los glomérulos, con depósitos subendoteliales.",
+      texto: "¿A qué clase de nefritis lúpica (clasificación ISN/RPS) corresponde este hallazgo histológico, y cuál es su implicación terapéutica?",
+      opciones: ["Clase II (mesangial); solo observación", "Clase V (membranosa) exclusivamente; antipalúdicos únicamente", "Clase IV (proliferativa difusa); requiere terapia inmunosupresora de inducción agresiva", "Clase I; sin tratamiento específico", "Clase VI (esclerosante avanzada); solo manejo de soporte"],
+      correcta: 2,
+      justificacion: "La nefritis lúpica clase IV (proliferativa difusa, ≥50% de glomérulos) es la forma más agresiva; requiere inducción inmunosupresora intensiva (micofenolato de mofetilo o ciclofosfamida, asociados a glucocorticoides) para evitar progresión a enfermedad renal terminal." },
+
+    { cat: "Lupus y SAF",
+      vineta: "Paciente con LES conocido desarrolla, en pocas semanas, trombocitopenia aislada (35 000/mm³) sin sangrado activo evidente, y previamente había presentado un episodio de convulsiones atribuido a la enfermedad de base.",
+      texto: "¿A qué dominio de manifestaciones extrarrenales del LES corresponden estos hallazgos?",
+      opciones: ["Manifestaciones exclusivamente cutáneas", "Manifestaciones hematológicas (citopenias autoinmunes) y neuropsiquiátricas", "Manifestaciones pulmonares", "Manifestaciones exclusivamente articulares", "Manifestaciones oculares"],
+      correcta: 1,
+      justificacion: "El LES puede afectar los dominios hematológico (citopenias autoinmunes) y neuropsiquiátrico (convulsiones, psicosis, entre otras manifestaciones del lupus neuropsiquiátrico), además de los dominios cutáneo, articular, seroso y pulmonar. Reconocer estos dominios modifica la intensidad del tratamiento inmunosupresor requerido." },
+
+    { cat: "Lupus y SAF",
+      vineta: "Mujer de 29 años con dos abortos espontáneos antes de la semana 10 de gestación y un episodio de trombosis venosa profunda no provocada. Anticoagulante lúpico, anticardiolipinas y anti-β2-glicoproteína I resultan positivos los tres, en dos determinaciones separadas por 12 semanas.",
+      texto: "¿Qué diagnóstico es más consistente con este perfil clínico-serológico, y qué implica la triple positividad de anticuerpos antifosfolípidos?",
+      opciones: ["Síndrome de Sjögren; sin implicación pronóstica", "Síndrome antifosfolípido; la triple positividad se asocia a mayor riesgo trombótico que la positividad aislada", "Esclerosis sistémica; indica buen pronóstico", "Vasculitis ANCA; requiere solo seguimiento", "Fibromialgia; hallazgo incidental sin relevancia clínica"],
+      correcta: 1,
+      justificacion: "El síndrome antifosfolípido se clasifica combinando criterios clínicos (trombosis y/o morbilidad obstétrica) con positividad persistente (≥12 semanas) de anticuerpos antifosfolípidos. La triple positividad identifica al subgrupo de mayor riesgo trombótico recurrente, lo que influye en la intensidad y duración de la anticoagulación." },
+
+    { cat: "Esclerodermia / miopatías / Sjögren",
+      vineta: "Paciente con esclerosis sistémica difusa de inicio reciente desarrolla, en pocos días, hipertensión arterial de difícil control y deterioro agudo de la función renal.",
+      texto: "¿Qué complicación grave y potencialmente reversible debe sospecharse de inmediato, y qué tratamiento es prioritario?",
+      opciones: ["Nefritis lúpica; micofenolato", "Crisis renal esclerodérmica; inhibidores de la enzima convertidora de angiotensina (IECA)", "Glomerulonefritis postinfecciosa; antibióticos", "Nefropatía por AINEs; suspender analgésicos únicamente", "Síndrome hepatorrenal; albúmina"],
+      correcta: 1,
+      justificacion: "La crisis renal esclerodérmica es una urgencia en esclerosis sistémica (más frecuente en la forma difusa), caracterizada por hipertensión acelerada y deterioro renal agudo por vasoespasmo de arteriolas renales. El tratamiento de elección son los IECA, que reducen significativamente la mortalidad si se inician precozmente." },
+
+    { cat: "Esclerodermia / miopatías / Sjögren",
+      vineta: "Mujer de 40 años presenta debilidad muscular proximal simétrica progresiva, eritema violáceo periorbitario (signo en heliotropo) y pápulas eritemato-descamativas sobre articulaciones metacarpofalángicas e interfalángicas (signo de Gottron). CK elevada.",
+      texto: "Ante este cuadro de dermatomiositis, ¿qué estudio adicional es obligatorio independientemente de la edad, por la asociación conocida de esta entidad?",
+      opciones: ["Biopsia de arteria temporal", "Tamizaje de neoplasia oculta (miositis asociada a tumor)", "Ecocardiograma exclusivamente", "Colonoscopia únicamente en menores de 30 años", "No se requiere estudio adicional"],
+      correcta: 1,
+      justificacion: "La dermatomiositis tiene una asociación bien establecida con neoplasias ocultas, particularmente en los primeros 1–3 años tras el diagnóstico, por lo que se recomienda tamizaje oncológico dirigido por edad y sexo en todo paciente con diagnóstico reciente." },
+
+    { cat: "Esclerodermia / miopatías / Sjögren",
+      vineta: "Mujer de 55 años refiere xerostomía y xeroftalmia de más de un año de evolución. Anti-Ro/SSA y anti-La/SSB positivos, y biopsia de glándula salival menor con focos de sialoadenitis linfocítica.",
+      texto: "Además de confirmar el síndrome de Sjögren primario, ¿qué complicación a largo plazo debe vigilarse activamente en el seguimiento de estos pacientes?",
+      opciones: ["Mayor riesgo de linfoma no Hodgkin (particularmente de células B, tipo MALT)", "Mayor riesgo de cáncer de tiroides exclusivamente", "No existe riesgo oncológico asociado", "Mayor riesgo de melanoma cutáneo", "Mayor riesgo de cáncer gástrico difuso"],
+      correcta: 0,
+      justificacion: "El síndrome de Sjögren primario conlleva un riesgo aumentado de linfoma no Hodgkin, predominantemente de células B de la zona marginal (tipo MALT), especialmente ante parotidomegalia persistente, crioglobulinemia o hipocomplementemia, datos que deben orientar la vigilancia activa." },
+
+    { cat: "Vasculitis",
+      vineta: "Mujer de 72 años presenta cefalea temporal de inicio reciente, claudicación mandibular al masticar y un episodio transitorio de pérdida de visión monocular. VSG y PCR marcadamente elevadas.",
+      texto: "Ante la sospecha de arteritis de células gigantes, ¿cuál es la conducta terapéutica inmediata que no debe retrasarse en espera de confirmación histológica?",
+      opciones: ["Esperar biopsia de arteria temporal antes de cualquier tratamiento", "Iniciar glucocorticoides a dosis altas de inmediato, sin esperar la biopsia", "Iniciar anticoagulación plena", "Solicitar solo ecografía Doppler y diferir decisión una semana", "Iniciar antibióticos empíricos"],
+      correcta: 1,
+      justificacion: "La arteritis de células gigantes es una urgencia oftalmológica: el riesgo de ceguera irreversible obliga a iniciar glucocorticoides a dosis altas de inmediato ante sospecha clínica razonable, sin esperar la biopsia de arteria temporal, que conserva utilidad diagnóstica si se realiza dentro de las primeras semanas de tratamiento." },
+
+    { cat: "Vasculitis",
+      vineta: "Varón de 58 años presenta hemoptisis, deterioro rápido de la función renal con sedimento urinario activo (hematuria dismórfica, cilindros hemáticos) y sinusitis crónica. ANCA-c/anti-PR3 positivos.",
+      texto: "¿Qué vasculitis asociada a ANCA es más probable, y qué combinación terapéutica se prioriza para inducir remisión en enfermedad grave con compromiso de órgano mayor?",
+      opciones: ["Poliangeítis microscópica; solo AINEs", "Granulomatosis con poliangeítis (antes Wegener); glucocorticoides combinados con rituximab o ciclofosfamida", "Vasculitis IgA; observación", "Arteritis de Takayasu; angioplastia inmediata", "Poliarteritis nodosa; antivirales"],
+      correcta: 1,
+      justificacion: "La tríada de compromiso de vía respiratoria superior, pulmonar y renal con ANCA-c/anti-PR3 positivo es característica de granulomatosis con poliangeítis. En enfermedad grave con compromiso de órgano mayor, la inducción de remisión combina glucocorticoides con rituximab o ciclofosfamida." },
+
+    { cat: "Enfermedades no inflamatorias",
+      vineta: "Dos pacientes varones de 60 años consultan por dolor articular. El primero presenta episodios recurrentes de monoartritis aguda muy dolorosa de la primera articulación metatarsofalángica, con hiperuricemia; el líquido sinovial muestra cristales en forma de aguja con birrefringencia negativa. El segundo presenta dolor crónico progresivo de rodillas, peor con el uso y que mejora con el reposo, rigidez matutina breve (< 30 min) y crepitación a la palpación, sin signos inflamatorios francos.",
+      texto: "¿Qué entidades corresponden respectivamente a cada paciente?",
+      opciones: ["Ambos tienen gota", "Ambos tienen osteoartritis", "Primer paciente: gota (cristales de urato monosódico); segundo paciente: osteoartritis (patrón mecánico, no inflamatorio)", "Primer paciente: condrocalcinosis; segundo paciente: artritis reumatoide", "Ambos tienen artritis séptica"],
+      correcta: 2,
+      justificacion: "La gota se caracteriza por cristales de urato monosódico (aguja, birrefringencia negativa) y ataques recurrentes de monoartritis aguda, clásicamente en la primera metatarsofalángica. La osteoartritis es la artropatía degenerativa más frecuente, con dolor de ritmo mecánico y ausencia de signos inflamatorios sistémicos marcados; la distinción es esencial porque el manejo es completamente distinto." },
+
+    { cat: "Enfermedades no inflamatorias",
+      vineta: "Mujer de 38 años consulta por dolor musculoesquelético difuso de más de 3 meses de evolución, fatiga, sueño no reparador y dificultad de concentración. El examen articular es normal, sin sinovitis ni signos inflamatorios, y los reactantes de fase aguda son normales.",
+      texto: "Según los criterios diagnósticos vigentes de fibromialgia, ¿qué hallazgo clínico-exploratorio es clave para diferenciarla de una enfermedad reumatológica inflamatoria?",
+      opciones: ["Presencia de sinovitis evidente en articulaciones de manos", "Ausencia de signos objetivos de inflamación articular pese a dolor difuso generalizado, con examen físico e índices inflamatorios normales", "Elevación marcada de VSG y PCR", "Presencia de erosiones radiográficas", "ANA positivo a título alto"],
+      correcta: 1,
+      justificacion: "La fibromialgia es un síndrome de dolor central (sensibilización central), sin sustrato inflamatorio objetivable: el examen articular es normal y los reactantes de fase aguda no están elevados. Los criterios ACR vigentes se basan en el índice de dolor generalizado y la escala de severidad de síntomas, sin requerir estudios de laboratorio extensos cuando la clínica es típica." }
+  ];
+
+  var TOTAL = QUESTIONS.length;
+  var TIME_LIMIT = 20 * 60; // 20 minutos
+  var answers = new Array(TOTAL).fill(null);
+  var current = 0;
+  var remaining = TIME_LIMIT;
+  var timerHandle = null;
+  var finished = false;
+
+  var screenRegistro = document.getElementById('screen-registro');
+  var screenExamen = document.getElementById('screen-examen');
+  var screenResultados = document.getElementById('screen-resultados');
+
+  document.getElementById('btn-empezar').addEventListener('click', function () {
+    screenRegistro.hidden = true;
+    screenExamen.hidden = false;
+    renderQuestion();
+    startTimer();
+  });
+
+  function startTimer() {
+    timerHandle = setInterval(function () {
+      remaining--;
+      updateTimerDisplay();
+      if (remaining <= 0) {
+        clearInterval(timerHandle);
+        finalizeExam();
+      }
+    }, 1000);
+  }
+
+  function updateTimerDisplay() {
+    var m = Math.floor(remaining / 60);
+    var s = remaining % 60;
+    var el = document.getElementById('timer-display');
+    el.textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+    el.classList.toggle('warn', remaining <= 120);
+  }
+  updateTimerDisplay();
+
+  function renderQuestion() {
+    var q = QUESTIONS[current];
+    document.getElementById('contador-preg').textContent = 'Pregunta ' + (current + 1) + ' de ' + TOTAL;
+    document.getElementById('progress-fill').style.width = (((current + 1) / TOTAL) * 100) + '%';
+    document.getElementById('q-vineta').textContent = q.vineta;
+    document.getElementById('q-texto').textContent = q.texto;
+
+    var cont = document.getElementById('q-opciones');
+    cont.innerHTML = '';
+    var letras = ['A', 'B', 'C', 'D', 'E'];
+    q.opciones.forEach(function (opt, i) {
+      var div = document.createElement('div');
+      div.className = 'opcion' + (answers[current] === i ? ' selected' : '');
+      div.innerHTML = '<span class="letra">' + letras[i] + '</span><span>' + opt + '</span>';
+      div.addEventListener('click', function () {
+        answers[current] = i;
+        renderQuestion();
+      });
+      cont.appendChild(div);
+    });
+
+    document.getElementById('btn-anterior').disabled = (current === 0);
+    document.getElementById('btn-siguiente').textContent = (current === TOTAL - 1) ? 'Revisar →' : 'Siguiente →';
+  }
+
+  document.getElementById('btn-anterior').addEventListener('click', function () {
+    if (current > 0) { current--; renderQuestion(); }
+  });
+  document.getElementById('btn-siguiente').addEventListener('click', function () {
+    if (current < TOTAL - 1) { current++; renderQuestion(); }
+  });
+
+  document.getElementById('btn-finalizar').addEventListener('click', function () {
+    var sinResponder = answers.filter(function (a) { return a === null; }).length;
+    var overlay = document.getElementById('overlay-confirm');
+    document.getElementById('overlay-text').textContent = sinResponder > 0
+      ? 'Tienes ' + sinResponder + ' pregunta(s) sin responder. ¿Deseas finalizar el examen de todas formas?'
+      : '¿Seguro que deseas finalizar el examen?';
+    overlay.hidden = false;
+  });
+  document.getElementById('overlay-cancel').addEventListener('click', function () {
+    document.getElementById('overlay-confirm').hidden = true;
+  });
+  document.getElementById('overlay-ok').addEventListener('click', function () {
+    document.getElementById('overlay-confirm').hidden = true;
+    clearInterval(timerHandle);
+    finalizeExam();
+  });
+
+  function finalizeExam() {
+    if (finished) return;
+    finished = true;
+    screenExamen.hidden = true;
+    screenResultados.hidden = false;
+
+    var correctCount = 0;
+    var catStats = {};
+    QUESTIONS.forEach(function (q, i) {
+      if (!catStats[q.cat]) catStats[q.cat] = { correct: 0, total: 0 };
+      catStats[q.cat].total++;
+      if (answers[i] === q.correcta) { correctCount++; catStats[q.cat].correct++; }
+    });
+
+    var pct = Math.round((correctCount / TOTAL) * 1000) / 10;
+    var passed = pct >= 60;
+
+    var numEl = document.getElementById('res-porcentaje');
+    numEl.textContent = pct + '% (' + correctCount + '/' + TOTAL + ')';
+    numEl.classList.add(passed ? 'pass' : 'fail');
+    var estEl = document.getElementById('res-estado');
+    estEl.textContent = passed ? 'APROBADO' : 'REPROBADO';
+    estEl.classList.add(passed ? 'pass' : 'fail');
+
+    var table = document.getElementById('res-breakdown');
+    var html = '<tr><th>Categoría</th><th>Correctas</th></tr>';
+    Object.keys(catStats).forEach(function (cat) {
+      var s = catStats[cat];
+      html += '<tr><td>' + cat + '</td><td class="num">' + s.correct + ' / ' + s.total + '</td></tr>';
+    });
+    table.innerHTML = html;
+
+    var reviewCont = document.getElementById('res-review');
+    var letras = ['A', 'B', 'C', 'D', 'E'];
+    var reviewHtml = '';
+    QUESTIONS.forEach(function (q, i) {
+      var chosen = answers[i];
+      var isCorrect = chosen === q.correcta;
+      reviewHtml += '<div class="review-item ' + (isCorrect ? 'correct' : 'incorrect') + '">';
+      reviewHtml += '<div class="review-head"><span class="qn">Pregunta ' + (i + 1) + '</span><span class="tag">' + q.cat + '</span><span class="mark">' + (isCorrect ? '✓ Correcta' : '✗ Incorrecta') + '</span></div>';
+      q.opciones.forEach(function (opt, j) {
+        var cls = 'review-opt';
+        if (j === q.correcta) cls += ' is-correct';
+        else if (j === chosen) cls += ' is-chosen-wrong';
+        reviewHtml += '<div class="' + cls + '">' + letras[j] + ') ' + opt + (j === chosen ? '  — tu respuesta' : '') + '</div>';
+      });
+      if (chosen === null) reviewHtml += '<div class="review-opt is-chosen-wrong">Sin respuesta registrada</div>';
+      reviewHtml += '<div class="review-just">Justificación: ' + q.justificacion + '</div>';
+      reviewHtml += '</div>';
+    });
+    reviewCont.innerHTML = reviewHtml;
+
+    var claveTable = document.getElementById('res-clave');
+    var claveHtml = '<tr><th>#</th><th>Respuesta correcta</th><th>Justificación</th></tr>';
+    QUESTIONS.forEach(function (q, i) {
+      claveHtml += '<tr><td class="num">' + (i + 1) + '</td><td>' + letras[q.correcta] + ') ' + q.opciones[q.correcta] + '</td><td class="just">' + q.justificacion + '</td></tr>';
+    });
+    claveTable.innerHTML = claveHtml;
+
+    buildPrintView(correctCount, pct, passed, catStats);
+  }
+
+  function buildPrintView(correctCount, pct, passed, catStats) {
+    var nombre = document.getElementById('inp-nombre').value.trim() || 'Sin nombre';
+    var nivel = document.getElementById('inp-nivel').value;
+    var fecha = new Date().toLocaleDateString('es-BO', { day: '2-digit', month: 'long', year: 'numeric' });
+    var letras = ['A', 'B', 'C', 'D', 'E'];
+
+    var h = '<div class="pv-page">';
+    h += '<div class="pv-header"><div class="inst">Hospital Belga — Jefatura de Enseñanza y Residentes</div>';
+    h += '<h1>Examen de Reumatología — Módulo 1</h1>';
+    h += '<div class="mod">Sesiones 1–23 (excluye Imagenología) · Nivel R1–R2</div></div>';
+
+    h += '<div class="pv-meta"><div><strong>Residente:</strong> ' + escapeHtml(nombre) + ' (' + nivel + ')</div><div><strong>Fecha:</strong> ' + fecha + '</div></div>';
+
+    h += '<div class="pv-score"><div class="n ' + (passed ? 'pass' : 'fail') + '">' + pct + '%</div><div class="e ' + (passed ? 'pass' : 'fail') + '">' + (passed ? 'APROBADO' : 'REPROBADO') + ' (' + correctCount + '/' + TOTAL + ')</div></div>';
+
+    h += '<table class="pv-table"><tr><th>Categoría</th><th>Correctas</th></tr>';
+    Object.keys(catStats).forEach(function (cat) {
+      var s = catStats[cat];
+      h += '<tr><td>' + cat + '</td><td class="c">' + s.correct + ' / ' + s.total + '</td></tr>';
+    });
+    h += '</table>';
+
+    QUESTIONS.forEach(function (q, i) {
+      var chosen = answers[i];
+      h += '<div class="pv-q"><div class="qh">Pregunta ' + (i + 1) + ' — ' + q.cat + '</div>';
+      h += '<div class="qv">' + escapeHtml(q.vineta) + '</div>';
+      h += '<div>' + escapeHtml(q.texto) + '</div>';
+      q.opciones.forEach(function (opt, j) {
+        var cls = 'qo';
+        if (j === q.correcta) cls += ' ok';
+        else if (j === chosen) cls += ' bad';
+        h += '<div class="' + cls + '">' + letras[j] + ') ' + escapeHtml(opt) + '</div>';
+      });
+      h += '<div class="qj">Justificación: ' + escapeHtml(q.justificacion) + '</div></div>';
+    });
+
+    h += '<div class="pv-break"><div class="pv-section-title">Clave de respuestas</div>';
+    h += '<table class="pv-table"><tr><th>#</th><th>Respuesta correcta</th><th>Justificación</th></tr>';
+    QUESTIONS.forEach(function (q, i) {
+      h += '<tr><td class="c">' + (i + 1) + '</td><td>' + letras[q.correcta] + ') ' + escapeHtml(q.opciones[q.correcta]) + '</td><td>' + escapeHtml(q.justificacion) + '</td></tr>';
+    });
+    h += '</table></div>';
+
+    h += '<div class="pv-signatures">';
+    h += '<div class="pv-sig"><div class="line">Firma del residente<br>' + escapeHtml(nombre) + '</div></div>';
+    h += '<div class="pv-sig"><div class="line">Dr. Luis Rodríguez<br>Reumatólogo / Internista — Jefe de Enseñanza</div><div class="seal">Sello</div></div>';
+    h += '</div>';
+
+    h += '</div>';
+    document.getElementById('print-view').innerHTML = h;
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  document.getElementById('btn-generar-pdf').addEventListener('click', function () {
+    window.print();
+  });
+
+})();
+</script>
+
+</body>
+</html>
